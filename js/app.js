@@ -1,69 +1,101 @@
 (() => {
-    class DogsAPI {
 
-        constructor() {
-            this.select = document.querySelector('#search-dog');
-            this.optionSelect = document.querySelector('.select-dog');
-            this.picturesDiv = document.querySelector('.pictures');
-            this.events()
+    const resultsDiv = document.querySelector('.results')
+
+    const cleanHTML = () => {
+        while (resultsDiv.firstChild) {
+            resultsDiv.removeChild(resultsDiv.firstChild)
         }
-
-        events() {
-            document.addEventListener('DOMContentLoaded', () => {
-                this.select.addEventListener('change', this.getPictures)
-                this.getDogsNames()
-            })
-        }
-
-        async getDogsNames() {
-            const url = "https://dog.ceo/api/breeds/list/all"
-
-            try {
-                const respond = await fetch(url)
-                const result = await respond.json()
-                const { message: names } = result
-
-                for (const name in names) {
-                    const option = document.createElement('option')
-                    option.value = name
-                    option.textContent = name
-                    this.select.appendChild(option)
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
-        async getPictures(e) {
-            const picturesDiv = document.querySelector('.pictures')
-
-            while (picturesDiv.firstChild) {
-                picturesDiv.removeChild(picturesDiv.firstChild)
-            }
-
-            const search = e.target.value
-            const url = `https://dog.ceo/api/breed/${search}/images/random/3`
-
-            try {
-                const respond = await fetch(url)
-                const result = await respond.json()
-                const { message: pictures } = result
-
-                const nameTitle = document.querySelector('.name-dog')
-                nameTitle.textContent = search
-
-                pictures.forEach(picture => {
-                    const img = document.createElement('img')
-                    img.src = picture
-                    img.setAttribute('alt', `imagen de ${search}`)
-                    picturesDiv.appendChild(img)
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
     }
 
-    new DogsAPI()
+    const spinner = (div) => {
+        cleanHTML()
+        const spinner = document.createElement('div')
+        spinner.classList.add('sk-circle')
+
+        spinner.innerHTML = `
+            <div class="sk-circle1 sk-child"></div>
+            <div class="sk-circle2 sk-child"></div>
+            <div class="sk-circle3 sk-child"></div>
+            <div class="sk-circle4 sk-child"></div>
+            <div class="sk-circle5 sk-child"></div>
+            <div class="sk-circle6 sk-child"></div>
+            <div class="sk-circle7 sk-child"></div>
+            <div class="sk-circle8 sk-child"></div>
+            <div class="sk-circle9 sk-child"></div>
+            <div class="sk-circle10 sk-child"></div>
+            <div class="sk-circle11 sk-child"></div>
+            <div class="sk-circle12 sk-child"></div>
+        `
+        resultsDiv.appendChild(spinner)
+    }
+
+    const imprPictures = (pictures, name) => {
+        cleanHTML()
+
+        const nameDog = document.createElement('div')
+        nameDog.classList.add('name-dog')
+        nameDog.textContent = name
+
+        const picturesDiv = document.createElement('div')
+        picturesDiv.classList.add('pictures')
+
+        resultsDiv.appendChild(nameDog)
+
+        pictures.forEach(picture => {
+            const img = document.createElement('img')
+            img.src = picture
+            img.setAttribute('alt', `ìmagen de ${name}`)
+
+            picturesDiv.appendChild(img)
+            resultsDiv.appendChild(picturesDiv)
+        });
+    }
+
+    const getPictures = async (e) => {
+        const search = e.target.value
+        const url = `https://dog.ceo/api/breed/${search}/images/random/3`
+
+        spinner()
+
+        try {
+            const respond = await fetch(url)
+            const result = await respond.json()
+            const { message: pictures } = result
+
+            // console.log(pictures);
+            imprPictures(pictures, search)
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const getDogsNames = async () => {
+        const url = "https://dog.ceo/api/breeds/list/all"
+
+        try {
+            const respond = await fetch(url)
+            const result = await respond.json()
+            const { message: names } = result
+
+            for (const name in names) {
+                const option = document.createElement('option')
+                option.value = name
+                option.textContent = name
+                document.querySelector('#search-dog').appendChild(option)
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const eventListeners = () => {
+        document.addEventListener('DOMContentLoaded', getDogsNames)
+        document.querySelector('#search-dog').addEventListener('change', getPictures)
+    }
+    eventListeners()
+
+
+
 })()
